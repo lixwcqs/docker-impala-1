@@ -67,6 +67,7 @@ services:
     - 25000:25000
     - 25010:25010
     - 25020:25020
+    # command: [/bin/bash, /start-impala.sh]
 networks:
   default:
     external:
