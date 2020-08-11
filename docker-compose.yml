@@ -37,12 +37,15 @@ services:
     - hadoop
     - zookeeper
     - postgres
+    volumes:
+    - "/home/li/workspace/azkaban:/azkaban"
     networks:
     - parrot
     environment:
       PGPASSWORD: postgres
       HADOOP_HOME: /usr/lib/hadoop
     ports:
+    - 18081:8081         
     - 10000:10000
     - 10001:10001
     - 10002:10002
@@ -61,7 +64,10 @@ services:
     - hadoop
     - hive
     - zookeeper
+    volumes:
+    - "/home/li/workspace/azkaban:/azkaban"
     ports:
+    - 28081:8081 
     - 21000:21000
     - 21050:21050
     - 25000:25000
