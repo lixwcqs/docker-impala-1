@@ -66,7 +66,7 @@ docker-compose up
    **分析之后发现是impala没有启动，执行手动启动命令**
 
    ```
-   docker-compose exec impala /bin/bash /start-impala.sh
+   docker-compose exec impala /bin/bash /start-impala.sh 
    ```
 
    
@@ -86,4 +86,69 @@ docker-compose up
 
    ![image-20200801140403881](./imgs/image-20200801140403881.png)
 
-5. 
+
+5. 若进入hive环境报错的话
+
+   ```shell
+   docker-compose exec impala /bin/bash hive 
+   ```
+
+   ![image-20200812001615072](./imgs/image-20200812001615072.png)
+
+   
+
+6. 若执行hive命名报错可以先初始化数据库. 可以依次执行
+```
+docker-compose exec impala /bin/bash
+mv /var/lib/hive/metastore/metastore_db /var/lib/hive/metastore/metastore_db.tmp
+/usr/lib/hive/bin/schematool   -initSchema -dbType derby
+```
+
+```shell
+li@cqs:docker-impala-1$ docker-compose exec impala /bin/bash 
+[root@d2d5958930f8 /]# 
+[root@d2d5958930f8 /]# 
+[root@d2d5958930f8 /]# /usr/lib/hive/bin/schematool   -initSchema -dbType derby
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/usr/lib/hive/lib/log4j-slf4j-impl-2.8.2.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/usr/lib/zookeeper/lib/slf4j-log4j12-1.7.25.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.apache.logging.slf4j.Log4jLoggerFactory]
+Metastore connection URL:	 jdbc:derby:;databaseName=/var/lib/hive/metastore/metastore_db;create=true
+Metastore Connection Driver :	 org.apache.derby.jdbc.EmbeddedDriver
+Metastore connection User:	 APP
+Starting metastore schema initialization to 2.1.1-cdh6.0.0
+Initialization script hive-schema-2.1.1.derby.sql
+
+ 
+Error: FUNCTION 'NUCLEUS_ASCII' already exists. (state=X0Y68,code=30000)
+org.apache.hadoop.hive.metastore.HiveMetaException: Schema initialization FAILED! Metastore state would be inconsistent !!
+Underlying cause: java.io.IOException : Schema script failed, errorcode 2
+Use --verbose for detailed stacktrace.
+*** schemaTool failed ***
+[root@d2d5958930f8 /]# mv /var/lib/hive/metastore/metastore_db /var/lib/hive/metastore/metastore_db.tmp
+[root@d2d5958930f8 /]# /usr/lib/hive/bin/schematool   -initSchema -dbType derby
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/usr/lib/hive/lib/log4j-slf4j-impl-2.8.2.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/usr/lib/zookeeper/lib/slf4j-log4j12-1.7.25.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.apache.logging.slf4j.Log4jLoggerFactory]
+Metastore connection URL:	 jdbc:derby:;databaseName=/var/lib/hive/metastore/metastore_db;create=true
+Metastore Connection Driver :	 org.apache.derby.jdbc.EmbeddedDriver
+Metastore connection User:	 APP
+Starting metastore schema initialization to 2.1.1-cdh6.0.0
+Initialization script hive-schema-2.1.1.derby.sql
+
+Initialization script completed
+schemaTool completed
+[root@d2d5958930f8 /]# 
+
+```
+
+测试如下：
+
+![image-20200812002059418](./imgs/image-20200812002059418.png)
+
+然后就可以使用该容器进行azkaban测试了hive任务了
+
+![image-20200812002352338](./imgs/image-20200812002352338.png)
